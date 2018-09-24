@@ -1,8 +1,8 @@
 {
   "visual": {
     "name": "Sunburst",
-    "displayName": "Sunburst",
-    "guid": "Sunburst1445472000808",
+    "displayName": "Sunburst with custom colour",
+    "guid": "banbanSunburst1445472000808",
     "visualClassName": "Sunburst",
     "version": "1.5.0",
     "description": "Sunburst is a multilevel donut chart, used to visualize hierarchical data, depicted by concentric circles.",

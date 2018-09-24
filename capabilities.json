@@ -7,6 +7,12 @@
       "kind": "Grouping"
     },
     {
+        "name": "Colours",
+        "displayName": "Colours With",
+        "displayNameKey": "Colours_With",
+        "kind": "Grouping"
+    },
+    {
       "name": "Values",
       "displayName": "Values",
       "displayNameKey": "Visual_Values",
@@ -27,9 +33,15 @@
       ],
       "matrix": {
         "rows": {
-          "for": {
-            "in": "Nodes"
-          }
+          "select": [{
+              "for": {
+                  "in": "Nodes"
+              }
+          }, {
+              "for": {
+                  "in": "Colours"
+              }
+          }]
         },
         "values": {
           "for": {

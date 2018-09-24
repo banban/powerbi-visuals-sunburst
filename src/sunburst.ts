@@ -524,7 +524,17 @@ module powerbi.extensibility.visual {
              ? `${originParentNodeValue}`
              : "";
 
-            const newDataPointNode: SunburstDataPoint = {
+            //get data from Colours group
+            let colourIndex = originParentNode.children 
+                ? originParentNode.children.length-1
+                : 1; //last group is colour ???
+
+            const colourToSet: string = colourIndex > 0 && originParentNode.children
+                ? <string>(originParentNode.children[colourIndex] ? originParentNode.children[colourIndex].value 
+                    : "yellow") //no colour
+                : "red"; //no children
+
+             const newDataPointNode: SunburstDataPoint = {
                 name,
                 identity,
                 selected: false,
@@ -544,15 +554,18 @@ module powerbi.extensibility.visual {
             if (name && level === 2 && !originParentNode.objects) {
                 const color: string = colorHelper.getHighContrastColor(
                     "foreground",
-                    colorPalette.getColor(name).value,
+                    colourToSet//colorPalette.getColor(name).value,
                 );
 
                 newDataPointNode.color = color;
             } else {
                 newDataPointNode.color = color;
             }
-
-            if (originParentNode.children && originParentNode.children.length > 0) {
+            
+            if (originParentNode.children && originParentNode.children.length > 0
+                    //How to exclude last level ???  
+                    && name.charAt(0) != "#" //&& level <= colourIndex //exclude last group from the scope ???
+                ) {
                 for (const child of originParentNode.children) {
                     const color_node: string = this.getColor(
                         Sunburst.LegendPropertyIdentifier,
@@ -580,7 +593,9 @@ module powerbi.extensibility.visual {
 
             newDataPointNode.tooltipInfo = this.getTooltipData(
                 formatter,
-                name,
+                name
+                    + " level:"+ level
+                    + " colourSet:" + colourToSet, //debug current colour
                 newDataPointNode.total
             );
 
