@@ -489,7 +489,7 @@ module powerbi.extensibility.visual {
             level: number,
             formatter: IValueFormatter,
         ): SunburstDataPoint {
-
+            
             if (originParentNode.identity) {
                 pathIdentity = pathIdentity.concat([originParentNode.identity]);
             }
@@ -517,24 +517,14 @@ module powerbi.extensibility.visual {
             const valueToSet: number = originParentNode.values
                 ? <number>originParentNode.values[0].value
                 : 0;
-
+            
             const originParentNodeValue: PrimitiveValue = originParentNode.value;
 
             const name: string = originParentNodeValue != null
              ? `${originParentNodeValue}`
              : "";
-
-            //get data from Colours group
-            let colourIndex = originParentNode.children 
-                ? originParentNode.children.length-1
-                : 1; //last group is colour ???
-
-            const colourToSet: string = colourIndex > 0 && originParentNode.children
-                ? <string>(originParentNode.children[colourIndex] ? originParentNode.children[colourIndex].value 
-                    : "yellow") //no colour
-                : "red"; //no children
-
-             const newDataPointNode: SunburstDataPoint = {
+ 
+            const newDataPointNode: SunburstDataPoint = {
                 name,
                 identity,
                 selected: false,
@@ -546,32 +536,39 @@ module powerbi.extensibility.visual {
                 children: []
             };
 
-            data.dataPoints.push(newDataPointNode);
+            let colourToSet: string = originParentNode.values
+             ? (originParentNode.values[1] ? <string>originParentNode.values[1].value : "")
+             : ""; 
+             if (colourToSet === "") //use standard palette colour
+             {
+                newDataPointNode.color = colorPalette.getColor(name).value;
+                colourToSet = "default";
+             }
+             else{
+                 newDataPointNode.color = colourToSet;
+             }
 
+            data.dataPoints.push(newDataPointNode);
             data.total += newDataPointNode.value;
             newDataPointNode.children = [];
 
-            if (name && level === 2 && !originParentNode.objects) {
+            /*if (name && level === 2 && !originParentNode.objects) {
                 const color: string = colorHelper.getHighContrastColor(
                     "foreground",
-                    colourToSet//colorPalette.getColor(name).value,
+                    colorPalette.getColor(name).value,
                 );
 
                 newDataPointNode.color = color;
             } else {
                 newDataPointNode.color = color;
-            }
-            
-            if (originParentNode.children && originParentNode.children.length > 0
-                    //How to exclude last level ???  
-                    && name.charAt(0) != "#" //&& level <= colourIndex //exclude last group from the scope ???
-                ) {
+            }*/
+        
+            if (originParentNode.children && originParentNode.children.length > 0) {
                 for (const child of originParentNode.children) {
                     const color_node: string = this.getColor(
-                        Sunburst.LegendPropertyIdentifier,
-                        newDataPointNode.color,
-                        child.objects
-                    );
+                        Sunburst.LegendPropertyIdentifier, 
+                        newDataPointNode.color, 
+                        child.objects);
 
                     const newChild: SunburstDataPoint = this.covertTreeNodeToSunBurstDataPoint(
                         child,
@@ -593,9 +590,10 @@ module powerbi.extensibility.visual {
 
             newDataPointNode.tooltipInfo = this.getTooltipData(
                 formatter,
-                name
-                    + " level:"+ level
-                    + " colourSet:" + colourToSet, //debug current colour
+                name //add debug info
+                    + "\nlevel: "+ (level-1)
+                    + "\ncolour: " + colourToSet 
+                    ,
                 newDataPointNode.total
             );
 

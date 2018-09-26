@@ -10,7 +10,7 @@
         "name": "Colours",
         "displayName": "Colours With",
         "displayNameKey": "Colours_With",
-        "kind": "Grouping"
+        "kind": "Measure"
     },
     {
       "name": "Values",
@@ -33,20 +33,20 @@
       ],
       "matrix": {
         "rows": {
+          "for": {
+            "in": "Nodes"
+          }
+        },
+        "values": {
           "select": [{
               "for": {
-                  "in": "Nodes"
+                "in": "Values"
               }
-          }, {
+            }, {
               "for": {
                   "in": "Colours"
               }
           }]
-        },
-        "values": {
-          "for": {
-            "in": "Values"
-          }
         }
       }
     }
