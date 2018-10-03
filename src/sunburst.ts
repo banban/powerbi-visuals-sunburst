@@ -461,6 +461,7 @@ module powerbi.extensibility.visual {
 
             data.root = this.covertTreeNodeToSunBurstDataPoint(
                 dataView.matrix.rows.root,
+                dataView.matrix.columns.root,
                 null,
                 colorPalette,
                 colorHelper,
@@ -478,7 +479,8 @@ module powerbi.extensibility.visual {
         private maxLevels: number = 0;
 
         public covertTreeNodeToSunBurstDataPoint(
-            originParentNode: DataViewTreeNode,
+            originParentNode: DataViewMatrixNode,
+            originColourNode: DataViewMatrixNode,
             sunburstParentNode: SunburstDataPoint,
             colorPalette: IColorPalette,
             colorHelper: ColorHelper,
@@ -536,8 +538,8 @@ module powerbi.extensibility.visual {
                 children: []
             };
 
-            let colourToSet: string = originParentNode.values
-             ? (originParentNode.values[1] ? <string>originParentNode.values[1].value : "")
+            let colourToSet: string = originColourNode.children
+             ? (originColourNode.children[0] ? <string>originColourNode.children[0].value : "")
              : ""; 
              if (colourToSet === "") //use standard palette colour
              {
@@ -572,6 +574,7 @@ module powerbi.extensibility.visual {
 
                     const newChild: SunburstDataPoint = this.covertTreeNodeToSunBurstDataPoint(
                         child,
+                        originColourNode,
                         newDataPointNode,
                         colorPalette,
                         colorHelper,
@@ -593,6 +596,10 @@ module powerbi.extensibility.visual {
                 name //add debug info
                     + "\nlevel: "+ (level-1)
                     + "\ncolour: " + colourToSet 
+                    //+ "\nname: " + (originColourNode.name) 
+                    //+ "\nroot: " + (originColourColumns.root ? originColourColumns.root.name : "") 
+                    //+ "\nlevels: " + (originColourColumns.levels ? originColourColumns.levels.length : "") 
+                    //+ "\nsources: " + (originColourColumns.levels ? originColourColumns.levels.[0] : "") 
                     ,
                 newDataPointNode.total
             );

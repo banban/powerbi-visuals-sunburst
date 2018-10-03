@@ -10,7 +10,7 @@
         "name": "Colours",
         "displayName": "Colours With",
         "displayNameKey": "Colours_With",
-        "kind": "Measure"
+        "kind": "Grouping"
     },
     {
       "name": "Values",
@@ -26,6 +26,9 @@
           "Groups": {
             "min": 0
           },
+          "Colours": {
+            "max": 1
+          },
           "Values": {
             "max": 1
           }
@@ -37,16 +40,15 @@
             "in": "Nodes"
           }
         },
+        "columns": {
+          "for": {
+            "in": "Colours"
+          }
+        },
         "values": {
-          "select": [{
-              "for": {
-                "in": "Values"
-              }
-            }, {
-              "for": {
-                  "in": "Colours"
-              }
-          }]
+          "for": {
+            "in": "Values"
+          }
         }
       }
     }
