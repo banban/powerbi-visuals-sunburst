@@ -7,27 +7,24 @@
       "kind": "Grouping"
     },
     {
-        "name": "Colours",
-        "displayName": "Colours With",
-        "displayNameKey": "Colours_With",
-        "kind": "Grouping"
-    },
-    {
       "name": "Values",
       "displayName": "Values",
       "displayNameKey": "Visual_Values",
       "kind": "Measure"
+    },
+    {
+        "name": "Colours",
+        "displayName": "Colours With",
+        "displayNameKey": "Colours_With",
+        "kind": "GroupingOrMeasure"
     }
-  ],
+],
   "dataViewMappings": [
     {
       "conditions": [
         {
           "Groups": {
             "min": 0
-          },
-          "Colours": {
-            "max": 1
           },
           "Values": {
             "max": 1
@@ -40,15 +37,16 @@
             "in": "Nodes"
           }
         },
-        "columns": {
-          "for": {
-            "in": "Colours"
-          }
-        },
         "values": {
-          "for": {
-            "in": "Values"
-          }
+          "select": [{
+              "for": {
+                "in": "Values"
+              }
+            }, {
+              "for": {
+                  "in": "Colours"
+              }
+          }]
         }
       }
     }

@@ -260,6 +260,8 @@ module powerbi.extensibility.visual {
             );
 
             const selection: d3.Selection<SunburstDataPoint> = this.render(this.colorHelper);
+            //console.log('this.data:', this.data);
+            //console.log('selection:', selection);
 
             if (this.data) {
                 this.legendData = Sunburst.createLegend(this.data, this.settings);
@@ -458,10 +460,9 @@ module powerbi.extensibility.visual {
             };
 
             this.maxLevels = 0;
-
+            //console.log('dataView.matrix:', dataView.matrix);
             data.root = this.covertTreeNodeToSunBurstDataPoint(
                 dataView.matrix.rows.root,
-                dataView.matrix.columns.root,
                 null,
                 colorPalette,
                 colorHelper,
@@ -472,15 +473,33 @@ module powerbi.extensibility.visual {
                 1,
                 formatter,
             );
+            //console.log('data.root:', data.root);
 
             return data;
         }
 
         private maxLevels: number = 0;
 
+        public getNearestColour(
+            originParentNode: DataViewMatrixNode
+        ): string {
+            let colourToSet = (originParentNode.values ? <string>originParentNode.values[1].value : "");
+            if (colourToSet === "" && originParentNode.children) 
+            {
+                if (originParentNode.children[0].values)
+                {
+                    colourToSet = <string>originParentNode.children[0].values[1].value;
+                }
+                if (colourToSet === "") //try to get color from nested levels
+                {
+                    colourToSet = this.getNearestColour(originParentNode.children[0]);
+                }
+            }
+            return colourToSet;
+        }
+
         public covertTreeNodeToSunBurstDataPoint(
             originParentNode: DataViewMatrixNode,
-            originColourNode: DataViewMatrixNode,
             sunburstParentNode: SunburstDataPoint,
             colorPalette: IColorPalette,
             colorHelper: ColorHelper,
@@ -491,7 +510,6 @@ module powerbi.extensibility.visual {
             level: number,
             formatter: IValueFormatter,
         ): SunburstDataPoint {
-            
             if (originParentNode.identity) {
                 pathIdentity = pathIdentity.concat([originParentNode.identity]);
             }
@@ -517,7 +535,7 @@ module powerbi.extensibility.visual {
             const identity: ISelectionId = selectionIdBuilder.createSelectionId();
 
             const valueToSet: number = originParentNode.values
-                ? <number>originParentNode.values[0].value
+                ? Math.abs(<number>originParentNode.values[0].value)//use abs, negative values can't be used in sunburst
                 : 0;
             
             const originParentNodeValue: PrimitiveValue = originParentNode.value;
@@ -538,17 +556,16 @@ module powerbi.extensibility.visual {
                 children: []
             };
 
-            let colourToSet: string = originColourNode.children
-             ? (originColourNode.children[0] ? <string>originColourNode.children[0].value : "")
-             : ""; 
-             if (colourToSet === "") //use standard palette colour
-             {
+            let colourToSet: string = this.getNearestColour(originParentNode); 
+            if (colourToSet === "") //use standard palette colour
+            {
+                console.log('colour not found:', originParentNode);
                 newDataPointNode.color = colorPalette.getColor(name).value;
                 colourToSet = "default";
-             }
-             else{
+            }
+            else{
                  newDataPointNode.color = colourToSet;
-             }
+            }
 
             data.dataPoints.push(newDataPointNode);
             data.total += newDataPointNode.value;
@@ -574,7 +591,6 @@ module powerbi.extensibility.visual {
 
                     const newChild: SunburstDataPoint = this.covertTreeNodeToSunBurstDataPoint(
                         child,
-                        originColourNode,
                         newDataPointNode,
                         colorPalette,
                         colorHelper,
@@ -594,7 +610,7 @@ module powerbi.extensibility.visual {
             newDataPointNode.tooltipInfo = this.getTooltipData(
                 formatter,
                 name //add debug info
-                    + "\nlevel: "+ (level-1)
+                    + "\nlevel: "+ level
                     + "\ncolour: " + colourToSet 
                     //+ "\nname: " + (originColourNode.name) 
                     //+ "\nroot: " + (originColourColumns.root ? originColourColumns.root.name : "") 
