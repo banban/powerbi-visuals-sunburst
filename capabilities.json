@@ -14,9 +14,9 @@
     },
     {
         "name": "Colours",
-        "displayName": "Colours With",
-        "displayNameKey": "Colours_With",
-        "kind": "GroupingOrMeasure"
+        "displayName": "Group Colours",
+        "displayNameKey": "Group_Colours",
+        "kind": "Measure"
     }
 ],
   "dataViewMappings": [

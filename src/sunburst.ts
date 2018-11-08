@@ -481,20 +481,21 @@ module powerbi.extensibility.visual {
         private maxLevels: number = 0;
 
         public getNearestColour(
-            originParentNode: DataViewMatrixNode
+            originParentNode: DataViewMatrixNode,
+            groupLevel: number
         ): string {
-            let colourToSet = (originParentNode.values ? <string>originParentNode.values[1].value : "");
-            if (colourToSet === "" && originParentNode.children) 
+            let columnIndex = groupLevel-1;
+            let colourToSet = "";
+            if (colourToSet === "" && originParentNode.values && originParentNode.values[columnIndex])
             {
-                if (originParentNode.children[0].values)
-                {
-                    colourToSet = <string>originParentNode.children[0].values[1].value;
-                }
-                if (colourToSet === "") //try to get color from nested levels
-                {
-                    colourToSet = this.getNearestColour(originParentNode.children[0]);
-                }
+                colourToSet = <string>originParentNode.values[columnIndex].value; // debug + columnIndex.toString()
             }
+
+            if (colourToSet === "" && originParentNode.children) //try to get color from nested levels
+            {
+                colourToSet = this.getNearestColour(originParentNode.children[0], groupLevel);
+            }
+
             return colourToSet;
         }
 
@@ -556,7 +557,7 @@ module powerbi.extensibility.visual {
                 children: []
             };
 
-            let colourToSet: string = this.getNearestColour(originParentNode); 
+            let colourToSet: string = this.getNearestColour(originParentNode, level); 
             if (colourToSet === "") //use standard palette colour
             {
                 console.log('colour not found:', originParentNode);
